@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Auto-Reply - Smart Auto-Reply Generator</title>
+    <meta name="description" content="Try our email auto-reply generator with AI-powered tone detection and professional response suggestions.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .email-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .email-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .email-header h1 {
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .message-input {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .message-input textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .message-input button {
+            align-self: flex-end;
+        }
+
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tone-indicator {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .tone-positive {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .tone-neutral {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .tone-negative {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .suggestions {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .suggestion-card {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .suggestion-card p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .suggestion-card .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0;
+        }
+
+        .suggestion-card .copy-btn:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .email-preview {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            margin-top: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .email-preview .subject {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+
+        .email-preview .greeting {
+            margin-bottom: 1rem;
+        }
+
+        .email-preview .signature {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--light-text);
+        }
+
+        /* Simple Reply Styles */
+        .simple-reply-container {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .simple-reply-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .simple-reply-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .simple-replies {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .simple-reply-card {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .simple-reply-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .no-reply-message {
+            text-align: center;
+            color: var(--light-text);
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>Smart Auto-Reply</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#how-it-works">How it Works</a></li>
+                    <li><a href="index.html#pricing">Pricing</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="email-container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        
+        <div class="email-header">
+            <h1><i class="fas fa-envelope"></i> Email Auto-Reply</h1>
+            <p>Enter an email to analyze its tone and get professional response suggestions.</p>
+        </div>
+
+        <div class="message-input">
+            <textarea id="message" placeholder="Paste the email content here..."></textarea>
+            <button class="btn btn-primary" id="analyze-btn">
+                <i class="fas fa-magic"></i> Analyze & Generate Reply
+            </button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="tone-indicator" id="tone-indicator">
+                <!-- Tone will be displayed here -->
+            </div>
+
+            <div class="suggestions">
+                <h3>Suggested Email Responses</h3>
+                <div id="suggestions-container">
+                    <!-- Suggestions will be added here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Simple Reply Feature -->
+    <div class="simple-reply-container">
+        <div class="container">
+            <h3>Quick Reply Generator</h3>
+            <p>Type a simple message to get instant reply suggestions.</p>
+            
+            <div class="simple-reply-input">
+                <input type="text" id="simple-message" placeholder="Type a message (e.g., hi, hello, help)">
+                <button class="btn btn-primary" id="generate-reply-btn">
+                    <i class="fas fa-bolt"></i> Generate Reply
+                </button>
+            </div>
+
+            <div id="simple-replies" class="simple-replies">
+                <!-- Replies will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Templates -->
+    <script>
+        const responseTemplates = {
+            positive: [
+                {
+                    subject: "Thank You for Your Positive Feedback",
+                    greeting: "Dear Valued Customer,",
+                    body: "Thank you for your positive feedback regarding our service. We are delighted to hear that you are satisfied with our offerings.\n\nYour satisfaction is our top priority, and we are committed to maintaining the high standards that you have come to expect from us. If there is anything specific you would like to know more about or any other way we can assist you, please do not hesitate to reach out.",
+                    closing: "Best regards,"
+                },
+                {
+                    subject: "Appreciation for Your Support",
+                    greeting: "Dear Valued Customer,",
+                    body: "We are truly grateful for your kind words and positive feedback. It is customers like you who inspire us to continue delivering excellence in our services.\n\nYour satisfaction is what drives us to improve and innovate. Should you have any questions or need further assistance, our team is always here to help.",
+                    closing: "Warm regards,"
+                }
+            ],
+            negative: [
+                {
+                    subject: "Addressing Your Concerns",
+                    greeting: "Dear Valued Customer,",
+                    body: "I sincerely apologize for the inconvenience you have experienced. We take all feedback seriously and are committed to resolving this matter to your satisfaction.\n\nCould you please provide more details about the specific issues you encountered? This will help us address your concerns more effectively and implement necessary improvements.",
+                    closing: "Sincerely,"
+                },
+                {
+                    subject: "Your Feedback is Important to Us",
+                    greeting: "Dear Valued Customer,",
+                    body: "Thank you for bringing this matter to our attention. We deeply regret that your experience did not meet our usual standards of service.\n\nWe are committed to making things right and would appreciate the opportunity to address your concerns. Please share any additional details that could help us better understand and resolve the situation.",
+                    closing: "Best regards,"
+                }
+            ],
+            neutral: [
+                {
+                    subject: "Re: Your Inquiry",
+                    greeting: "Dear Valued Customer,",
+                    body: "Thank you for your message. I would be happy to assist you with your inquiry.\n\nTo provide you with the most relevant information, could you please provide more details about what you are looking for? This will help us better address your needs.",
+                    closing: "Best regards,"
+                },
+                {
+                    subject: "Response to Your Query",
+                    greeting: "Dear Valued Customer,",
+                    body: "Thank you for reaching out to us. I am here to help you with your inquiry.\n\nTo ensure I provide you with the most accurate and helpful information, could you please elaborate on your specific requirements or questions?",
+                    closing: "Kind regards,"
+                }
+            ],
+            specific: {
+                pricing: [
+                    {
+                        subject: "Our Pricing Information",
+                        greeting: "Dear Valued Customer,",
+                        body: "Thank you for your interest in our pricing plans. We offer three main tiers:\n\n- Basic Plan: $9.99/month\n  Includes all essential features\n\n- Pro Plan: $19.99/month\n  Includes advanced features and priority support\n\n- Enterprise Plan: Custom pricing\n  Tailored solutions for large organizations\n\nWould you like me to send you our detailed pricing brochure or schedule a call to discuss which plan would best suit your needs?",
+                        closing: "Best regards,"
+                    }
+                ],
+                features: [
+                    {
+                        subject: "Our Service Features",
+                        greeting: "Dear Valued Customer,",
+                        body: "Thank you for your interest in our features. Our auto-reply system includes:\n\n- AI-powered tone detection\n- Customizable response templates\n- Multi-channel integration\n- Advanced analytics\n- 24/7 support\n\nWould you like a detailed feature list or a demonstration of any specific feature?",
+                        closing: "Best regards,"
+                    }
+                ],
+                technical: [
+                    {
+                        subject: "Technical Setup Information",
+                        greeting: "Dear Valued Customer,",
+                        body: "Thank you for your interest in our technical setup process. The integration typically takes 15-30 minutes and includes:\n\n- Step-by-step setup guide\n- Video tutorials\n- Technical documentation\n- 24/7 technical support\n\nWould you like me to send you the setup documentation or schedule a technical consultation?",
+                        closing: "Best regards,"
+                    }
+                ],
+                support: [
+                    {
+                        subject: "Support Information",
+                        greeting: "Dear Valued Customer,",
+                        body: "Thank you for reaching out to our support team. We offer multiple support channels:\n\n- Live chat: Available 24/7\n- Email support: support@smartautoreply.com\n- Phone support: +1 (555) 123-4567\n\nPlease let us know how we can assist you, and we'll be happy to help.",
+                        closing: "Best regards,"
+                    }
+                ],
+                trial: [
+                    {
+                        subject: "Free Trial Information",
+                        greeting: "Dear Valued Customer,",
+                        body: "Thank you for your interest in our free trial. We offer a 14-day trial with:\n\n- Full access to all features\n- No credit card required\n- Dedicated support\n- Setup assistance\n\nWould you like me to send you the trial signup link or schedule a demo?",
+                        closing: "Best regards,"
+                    }
+                ]
+            }
+        };
+
+        // Keywords for tone detection
+        const toneKeywords = {
+            positive: ['thank', 'thanks', 'great', 'good', 'excellent', 'awesome', 'happy', 'satisfied', 'love', 'amazing', 'wonderful', 'perfect', 'appreciate', 'pleased'],
+            negative: ['bad', 'poor', 'terrible', 'awful', 'horrible', 'worst', 'hate', 'angry', 'upset', 'disappointed', 'refund', 'cancel', 'unhappy', 'dissatisfied'],
+            specific: {
+                pricing: ['price', 'cost', 'pricing', 'plan', 'subscription', 'monthly', 'yearly', 'fee', 'payment', 'quote', 'invoice'],
+                features: ['feature', 'function', 'capability', 'what can', 'how does', 'what does', 'include', 'offer', 'provide'],
+                technical: ['setup', 'install', 'configure', 'integration', 'technical', 'how to', 'guide', 'documentation', 'implementation'],
+                support: ['help', 'support', 'assist', 'issue', 'problem', 'error', 'contact', 'reach', 'trouble', 'difficulty'],
+                trial: ['trial', 'demo', 'test', 'try', 'free', 'sample', 'evaluate', 'assessment']
+            }
+        };
+
+        // Initialize elements
+        const messageInput = document.getElementById('message');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const results = document.getElementById('results');
+        const toneIndicator = document.getElementById('tone-indicator');
+        const suggestionsContainer = document.getElementById('suggestions-container');
+
+        // Analyze button click handler
+        analyzeBtn.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                showError('Please enter an email to analyze');
+                return;
+            }
+
+            // Detect tone and category
+            const analysis = detectTone(message);
+            displayResults(analysis);
+        });
+
+        function detectTone(message) {
+            const lowerMessage = message.toLowerCase();
+            let tone = 'neutral';
+            let category = null;
+            let maxMatches = 0;
+
+            // Check for specific categories first
+            for (const [cat, keywords] of Object.entries(toneKeywords.specific)) {
+                const matches = keywords.filter(keyword => lowerMessage.includes(keyword)).length;
+                if (matches > maxMatches) {
+                    maxMatches = matches;
+                    category = cat;
+                }
+            }
+
+            // If no specific category is detected, check general tone
+            if (maxMatches === 0) {
+                let positiveMatches = toneKeywords.positive.filter(keyword => lowerMessage.includes(keyword)).length;
+                let negativeMatches = toneKeywords.negative.filter(keyword => lowerMessage.includes(keyword)).length;
+
+                if (positiveMatches > negativeMatches) {
+                    tone = 'positive';
+                } else if (negativeMatches > positiveMatches) {
+                    tone = 'negative';
+                }
+            }
+
+            return {
+                type: category ? 'specific' : 'general',
+                category: category,
+                sentiment: tone
+            };
+        }
+
+        function displayResults(analysis) {
+            // Update tone indicator
+            const toneClass = analysis.type === 'specific' ? 'tone-neutral' : `tone-${analysis.sentiment}`;
+            const toneText = analysis.type === 'specific' 
+                ? `Detected Query: ${analysis.category.charAt(0).toUpperCase() + analysis.category.slice(1)}`
+                : `Detected Tone: ${analysis.sentiment.charAt(0).toUpperCase() + analysis.sentiment.slice(1)}`;
+
+            toneIndicator.className = `tone-indicator ${toneClass}`;
+            toneIndicator.innerHTML = `
+                <i class="fas fa-${analysis.sentiment === 'positive' ? 'smile' : analysis.sentiment === 'negative' ? 'frown' : 'meh'}"></i>
+                ${toneText}
+            `;
+
+            // Generate suggestions
+            suggestionsContainer.innerHTML = '';
+            let templates;
+            
+            if (analysis.type === 'specific') {
+                templates = responseTemplates.specific[analysis.category];
+            } else {
+                templates = responseTemplates[analysis.sentiment];
+            }
+            
+            templates.forEach(template => {
+                const card = document.createElement('div');
+                card.className = 'suggestion-card';
+                
+                const emailPreview = `
+                    <div class="email-preview">
+                        <div class="subject">${template.subject}</div>
+                        <div class="greeting">${template.greeting}</div>
+                        <div class="body">${template.body.replace(/\n/g, '<br>')}</div>
+                        <div class="closing">${template.closing}</div>
+                        <div class="signature">
+                            Smart Auto-Reply Team<br>
+                            Smart Auto-Reply Generator<br>
+                            support@smartautoreply.com
+                        </div>
+                    </div>
+                `;
+                
+                card.innerHTML = emailPreview + `
+                    <button class="copy-btn" onclick="copyToClipboard(this, '${template.subject}\n\n${template.greeting}\n\n${template.body}\n\n${template.closing}\n\nSmart Auto-Reply Team\nSmart Auto-Reply Generator\nsupport@smartautoreply.com')">
+                        <i class="far fa-copy"></i> Copy Full Email
+                    </button>
+                `;
+                suggestionsContainer.appendChild(card);
+            });
+
+            // Show results
+            results.classList.add('active');
+        }
+
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.color = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.color = 'var(--primary-color)';
+                }, 2000);
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'form-error';
+            errorDiv.textContent = message;
+            
+            const existingError = document.querySelector('.form-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            document.querySelector('.message-input').insertBefore(errorDiv, document.querySelector('.message-input').firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 3000);
+        }
+
+        // Simple Reply Feature
+        const simpleMessageInput = document.getElementById('simple-message');
+        const generateReplyBtn = document.getElementById('generate-reply-btn');
+        const simpleRepliesContainer = document.getElementById('simple-replies');
+
+        // Load responses
+        let responseData = [];
+        fetch('src/data/responses.json')
+            .then(response => response.json())
+            .then(data => {
+                responseData = data;
+            })
+            .catch(error => {
+                console.error('Error loading responses:', error);
+            });
+
+        generateReplyBtn.addEventListener('click', () => {
+            const message = simpleMessageInput.value.trim().toLowerCase();
+            
+            if (!message) {
+                showSimpleError('Please enter a message');
+                return;
+            }
+
+            // Find matching response
+            const match = responseData.find(item => item.input === message);
+            
+            // Clear previous replies
+            simpleRepliesContainer.innerHTML = '';
+
+            if (match) {
+                // Show matching replies
+                match.output.forEach(reply => {
+                    const card = document.createElement('div');
+                    card.className = 'simple-reply-card';
+                    card.innerHTML = `
+                        <p>${reply}</p>
+                        <button class="copy-btn" onclick="copyToClipboard(this, '${reply}')">
+                            <i class="far fa-copy"></i> Copy
+                        </button>
+                    `;
+                    simpleRepliesContainer.appendChild(card);
+                });
+            } else {
+                // Show no match message
+                const noReply = document.createElement('div');
+                noReply.className = 'no-reply-message';
+                noReply.textContent = "Sorry, I don't have a response for that.";
+                simpleRepliesContainer.appendChild(noReply);
+            }
+        });
+
+        function showSimpleError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'form-error';
+            errorDiv.textContent = message;
+            
+            const existingError = document.querySelector('.simple-reply-container .form-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            document.querySelector('.simple-reply-input').insertBefore(errorDiv, document.querySelector('.simple-reply-input').firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 3000);
+        }
+
+        // Add enter key support
+        simpleMessageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateReplyBtn.click();
+            }
+        });
+    </script>
+</body>
+</html> 

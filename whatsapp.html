@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Auto-Reply - Smart Auto-Reply Generator</title>
+    <meta name="description" content="Try our WhatsApp auto-reply generator with AI-powered tone detection and smart responses.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .whatsapp-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .whatsapp-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .whatsapp-header h1 {
+            color: #25D366;
+            margin-bottom: 1rem;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .message-input textarea {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .message-input button {
+            align-self: flex-end;
+        }
+
+        .results {
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tone-indicator {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+        }
+
+        .tone-positive {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .tone-neutral {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .tone-negative {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
+        .suggestions {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .suggestion-card {
+            background: var(--light-bg);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .suggestion-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .suggestion-card p {
+            margin-bottom: 1rem;
+        }
+
+        .suggestion-card .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0;
+        }
+
+        .suggestion-card .copy-btn:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Simple Reply Styles */
+        .simple-reply-container {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .simple-reply-input {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .simple-reply-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .simple-replies {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .simple-reply-card {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .simple-reply-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .no-reply-message {
+            text-align: center;
+            color: var(--light-text);
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>Smart Auto-Reply</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#how-it-works">How it Works</a></li>
+                    <li><a href="index.html#pricing">Pricing</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="whatsapp-container">
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+        
+        <div class="whatsapp-header">
+            <h1><i class="fab fa-whatsapp"></i> WhatsApp Auto-Reply</h1>
+            <p>Enter a message to analyze its tone and get AI-powered response suggestions.</p>
+        </div>
+
+        <div class="message-input">
+            <textarea id="message" placeholder="Type your message here..."></textarea>
+            <button class="btn btn-primary" id="analyze-btn">
+                <i class="fas fa-magic"></i> Analyze
+            </button>
+        </div>
+
+        <div class="results" id="results">
+            <div class="tone-indicator" id="tone-indicator">
+                <!-- Tone will be displayed here -->
+            </div>
+
+            <div class="suggestions">
+                <h3>Suggested Replies</h3>
+                <div id="suggestions-container">
+                    <!-- Suggestions will be added here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Simple Reply Feature -->
+    <div class="simple-reply-container">
+        <div class="container">
+            <h3>Quick Reply Generator</h3>
+            <p>Type a simple message to get instant reply suggestions.</p>
+            
+            <div class="simple-reply-input">
+                <input type="text" id="simple-message" placeholder="Type a message (e.g., hi, hello, help)">
+                <button class="btn btn-primary" id="generate-reply-btn">
+                    <i class="fas fa-bolt"></i> Generate Reply
+                </button>
+            </div>
+
+            <div id="simple-replies" class="simple-replies">
+                <!-- Replies will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Response Templates -->
+    <script>
+        const responseTemplates = {
+            positive: [
+                "Thank you for your positive feedback! We're thrilled to hear that you're happy with our service. Is there anything specific you'd like to know more about?",
+                "We're delighted to hear that you're satisfied! Your satisfaction is our top priority. Feel free to reach out if you need any assistance.",
+                "Thank you for your kind words! We're glad we could help. Don't hesitate to contact us if you have any questions."
+            ],
+            negative: [
+                "I understand your concern and I apologize for any inconvenience caused. Let me help you resolve this. Could you please provide more details about the issue?",
+                "I'm sorry to hear about your experience. We take feedback seriously and would like to make things right. Please let us know how we can help.",
+                "Thank you for bringing this to our attention. We're committed to improving our service. Could you share more information so we can address this properly?"
+            ],
+            neutral: [
+                "Thank you for your message. I'd be happy to help you with that. Could you please provide more details about what you're looking for?",
+                "Thanks for reaching out. I'll do my best to assist you. What specific information are you interested in?",
+                "Hello! I'm here to help. Could you please elaborate on your inquiry so I can provide the most relevant information?"
+            ],
+            specific: {
+                pricing: [
+                    "Our pricing plans start at $9.99/month for the Basic plan, which includes all essential features. Would you like me to send you our detailed pricing brochure?",
+                    "We offer flexible pricing options to suit different needs. The Basic plan is $9.99/month, Pro is $19.99/month, and Enterprise is custom-priced. Which plan interests you most?",
+                    "I'd be happy to discuss our pricing options. We have three main plans: Basic ($9.99/mo), Pro ($19.99/mo), and Enterprise (custom pricing). Would you like to know more about any specific plan?"
+                ],
+                features: [
+                    "Our auto-reply system includes smart tone detection, customizable responses, and integration with multiple platforms. Would you like a detailed feature list?",
+                    "We offer features like AI-powered response generation, multi-channel support, and analytics. Is there any specific feature you'd like to know more about?",
+                    "Our system includes smart templates, tone analysis, and automated responses. I can provide more details about any specific feature you're interested in."
+                ],
+                technical: [
+                    "Setting up our system is straightforward. We provide step-by-step guides and 24/7 technical support. Would you like me to send you the setup documentation?",
+                    "The integration process typically takes 15-30 minutes. We offer detailed documentation and video tutorials. Shall I share those with you?",
+                    "Our technical team can guide you through the setup process. Would you like to schedule a technical consultation?"
+                ],
+                support: [
+                    "Our support team is available 24/7. You can reach us through live chat, email, or phone. How can we assist you today?",
+                    "I'm here to help! Could you please describe the issue you're experiencing so I can connect you with the right support team?",
+                    "We offer multiple support channels including live chat, email, and phone support. What's the best way to help you?"
+                ],
+                trial: [
+                    "We offer a 14-day free trial with full access to all features. Would you like me to set that up for you?",
+                    "You can try our service free for 14 days, no credit card required. Shall I send you the trial signup link?",
+                    "Our free trial includes all premium features. Would you like to start your trial now? I can guide you through the process."
+                ]
+            }
+        };
+
+        // Keywords for tone detection
+        const toneKeywords = {
+            positive: ['thank', 'thanks', 'great', 'good', 'excellent', 'awesome', 'happy', 'satisfied', 'love', 'amazing', 'wonderful', 'perfect'],
+            negative: ['bad', 'poor', 'terrible', 'awful', 'horrible', 'worst', 'hate', 'angry', 'upset', 'disappointed', 'refund', 'cancel'],
+            specific: {
+                pricing: ['price', 'cost', 'pricing', 'plan', 'subscription', 'monthly', 'yearly', 'fee', 'payment'],
+                features: ['feature', 'function', 'capability', 'what can', 'how does', 'what does', 'include'],
+                technical: ['setup', 'install', 'configure', 'integration', 'technical', 'how to', 'guide', 'documentation'],
+                support: ['help', 'support', 'assist', 'issue', 'problem', 'error', 'contact', 'reach'],
+                trial: ['trial', 'demo', 'test', 'try', 'free', 'sample']
+            }
+        };
+
+        // Initialize elements
+        const messageInput = document.getElementById('message');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const results = document.getElementById('results');
+        const toneIndicator = document.getElementById('tone-indicator');
+        const suggestionsContainer = document.getElementById('suggestions-container');
+
+        // Analyze button click handler
+        analyzeBtn.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            
+            if (!message) {
+                showError('Please enter a message to analyze');
+                return;
+            }
+
+            // Detect tone and category
+            const analysis = detectTone(message);
+            displayResults(analysis);
+        });
+
+        function detectTone(message) {
+            const lowerMessage = message.toLowerCase();
+            let tone = 'neutral';
+            let category = null;
+            let maxMatches = 0;
+
+            // Check for specific categories first
+            for (const [cat, keywords] of Object.entries(toneKeywords.specific)) {
+                const matches = keywords.filter(keyword => lowerMessage.includes(keyword)).length;
+                if (matches > maxMatches) {
+                    maxMatches = matches;
+                    category = cat;
+                }
+            }
+
+            // If no specific category is detected, check general tone
+            if (maxMatches === 0) {
+                let positiveMatches = toneKeywords.positive.filter(keyword => lowerMessage.includes(keyword)).length;
+                let negativeMatches = toneKeywords.negative.filter(keyword => lowerMessage.includes(keyword)).length;
+
+                if (positiveMatches > negativeMatches) {
+                    tone = 'positive';
+                } else if (negativeMatches > positiveMatches) {
+                    tone = 'negative';
+                }
+            }
+
+            return {
+                type: category ? 'specific' : 'general',
+                category: category,
+                sentiment: tone
+            };
+        }
+
+        function displayResults(analysis) {
+            // Update tone indicator
+            const toneClass = analysis.type === 'specific' ? 'tone-neutral' : `tone-${analysis.sentiment}`;
+            const toneText = analysis.type === 'specific' 
+                ? `Detected Query: ${analysis.category.charAt(0).toUpperCase() + analysis.category.slice(1)}`
+                : `Detected Tone: ${analysis.sentiment.charAt(0).toUpperCase() + analysis.sentiment.slice(1)}`;
+
+            toneIndicator.className = `tone-indicator ${toneClass}`;
+            toneIndicator.innerHTML = `
+                <i class="fas fa-${analysis.sentiment === 'positive' ? 'smile' : analysis.sentiment === 'negative' ? 'frown' : 'meh'}"></i>
+                ${toneText}
+            `;
+
+            // Generate suggestions
+            suggestionsContainer.innerHTML = '';
+            let templates;
+            
+            if (analysis.type === 'specific') {
+                templates = responseTemplates.specific[analysis.category];
+            } else {
+                templates = responseTemplates[analysis.sentiment];
+            }
+            
+            templates.forEach(template => {
+                const card = document.createElement('div');
+                card.className = 'suggestion-card';
+                card.innerHTML = `
+                    <p>${template}</p>
+                    <button class="copy-btn" onclick="copyToClipboard(this, '${template}')">
+                        <i class="far fa-copy"></i> Copy
+                    </button>
+                `;
+                suggestionsContainer.appendChild(card);
+            });
+
+            // Show results
+            results.classList.add('active');
+        }
+
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.color = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.color = 'var(--primary-color)';
+                }, 2000);
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'form-error';
+            errorDiv.textContent = message;
+            
+            const existingError = document.querySelector('.form-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            document.querySelector('.message-input').insertBefore(errorDiv, document.querySelector('.message-input').firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 3000);
+        }
+
+        // Simple Reply Feature
+        const simpleMessageInput = document.getElementById('simple-message');
+        const generateReplyBtn = document.getElementById('generate-reply-btn');
+        const simpleRepliesContainer = document.getElementById('simple-replies');
+
+        // Load responses
+        let responseData = [];
+        fetch('src/data/responses.json')
+            .then(response => response.json())
+            .then(data => {
+                responseData = data;
+            })
+            .catch(error => {
+                console.error('Error loading responses:', error);
+            });
+
+        generateReplyBtn.addEventListener('click', () => {
+            const message = simpleMessageInput.value.trim().toLowerCase();
+            
+            if (!message) {
+                showSimpleError('Please enter a message');
+                return;
+            }
+
+            // Find matching response
+            const match = responseData.find(item => item.input === message);
+            
+            // Clear previous replies
+            simpleRepliesContainer.innerHTML = '';
+
+            if (match) {
+                // Show matching replies
+                match.output.forEach(reply => {
+                    const card = document.createElement('div');
+                    card.className = 'simple-reply-card';
+                    card.innerHTML = `
+                        <p>${reply}</p>
+                        <button class="copy-btn" onclick="copyToClipboard(this, '${reply}')">
+                            <i class="far fa-copy"></i> Copy
+                        </button>
+                    `;
+                    simpleRepliesContainer.appendChild(card);
+                });
+            } else {
+                // Show no match message
+                const noReply = document.createElement('div');
+                noReply.className = 'no-reply-message';
+                noReply.textContent = "Sorry, I don't have a response for that.";
+                simpleRepliesContainer.appendChild(noReply);
+            }
+        });
+
+        function showSimpleError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'form-error';
+            errorDiv.textContent = message;
+            
+            const existingError = document.querySelector('.simple-reply-container .form-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            document.querySelector('.simple-reply-input').insertBefore(errorDiv, document.querySelector('.simple-reply-input').firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 3000);
+        }
+
+        // Add enter key support
+        simpleMessageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateReplyBtn.click();
+            }
+        });
+    </script>
+</body>
+</html> 

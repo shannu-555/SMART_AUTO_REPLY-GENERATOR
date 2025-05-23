@@ -1,0 +1,89 @@
+[
+  {
+    "input": "hi",
+    "output": [
+      "Hello!",
+      "Hi, how can I help you?",
+      "Hey there!",
+      "Hello there! How can I assist you today?",
+      "Hi! I'm here to help. What can I do for you?"
+    ]
+  },
+  {
+    "input": "hello",
+    "output": [
+      "Hello! I'm your auto-reply assistant. How can I help?",
+      "Hi there! What can I do for you today?",
+      "Hello! I'm here to assist. What do you need?"
+    ]
+  },
+  {
+    "input": "what's your name",
+    "output": [
+      "I'm your smart auto-reply assistant!",
+      "You can call me SmartBot.",
+      "I'm your friendly AI assistant."
+    ]
+  },
+  {
+    "input": "how's the weather",
+    "output": [
+      "I'm not sure, but I hope it's sunny!",
+      "Great question! Check your favorite weather app.",
+      "It might be cloudy or sunny—who knows!"
+    ]
+  },
+  {
+    "input": "can you help me with my order",
+    "output": [
+      "Sure! What seems to be the issue?",
+      "I'd love to help. Can you share your order number?",
+      "Of course! Let's resolve it together."
+    ]
+  },
+  {
+    "input": "tell me a joke",
+    "output": [
+      "Why did the scarecrow win an award? Because he was outstanding in his field!",
+      "Why don't scientists trust atoms? Because they make up everything!",
+      "I'm reading a book on anti-gravity—it's impossible to put down!"
+    ]
+  },
+  {
+    "input": "help",
+    "output": [
+      "I'd be happy to help! What do you need assistance with?",
+      "Of course! I'm here to assist. What can I help you with?",
+      "Sure thing! What would you like help with?"
+    ]
+  },
+  {
+    "input": "thanks",
+    "output": [
+      "You're welcome!",
+      "Anytime!",
+      "Glad to help!",
+      "You're welcome! Is there anything else I can help with?",
+      "My pleasure! Let me know if you need anything else."
+    ]
+  },
+  {
+    "input": "thank you",
+    "output": [
+      "You're welcome!",
+      "Anytime!",
+      "Glad to help!",
+      "Happy to help! Feel free to reach out if you have more questions."
+    ]
+  },
+  {
+    "input": "bye",
+    "output": [
+      "See you later!",
+      "Take care!",
+      "Goodbye!",
+      "Goodbye! Have a great day!",
+      "Take care! Come back if you need anything."
+    ]
+  }
+] 
